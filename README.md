@@ -13,11 +13,12 @@ the -f flag for now and let me know your monitor's manufacture/product ID.
 
 # Building from source
 
-Clone or download the source code and run the following:
+Download, compile and install the source code by running the following:
 
     git clone https://github.com/fhunleth/blstrobe.git
+    cd blstrobe
 
-    # On Debian/Ubuntu, you may need to run sudo apt-get install autoconf
+    # On Debian/Ubuntu, you may need to run "sudo apt-get install autoconf"
 
     ./autogen.sh
     ./configure
