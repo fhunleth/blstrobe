@@ -1,4 +1,5 @@
-# Overview
+# blstrobe
+[![Build Status](https://travis-ci.org/fhunleth/blstrobe.svg)](https://travis-ci.org/fhunleth/blstrobe)
 
 This utility is used to configure the backlight strobe setting on BENQ Z-Series
 monitors with the V2 firmware. It's similar in purpose to the awesome [Blur Busters Strobe
