@@ -9,7 +9,9 @@ look at the [Blur Busters](http://www.blurbusters.com/) website for all of the
 information that you could possibly want on this topic.
 
 NOTE: I only have an XL2420Z monitor so monitor detection is limited. Use
-the -f flag for now and let me know your monitor's manufacture/product ID.
+the -f flag for now and let me know your monitor's manufacture/product ID. If
+you are having trouble with inconsistent results, try the `-r` option and let me
+know your setup and what value works for you.
 
 # Building from source
 
@@ -50,6 +52,7 @@ The following is the list of options:
     -g get the current settings
     -o <path> set path to i2c device (e.g., /dev/i2c-0)
     -p <phase> backlight strobe phase (0-47)
+    -r <retry count> increase if you're getting flakey results (default 20)
     -t <duration in us> backlight strobe time in microseconds (167-5000)
     -v verbose
 

@@ -66,6 +66,7 @@
 #define DDC_DEFAULT_DELAY_US      50000
 
 static int verbose = 0;
+static int retry_count = MAX_RETRIES;
 
 #define DEBUG_PRINTF(FORMAT, ...) if (verbose) fprintf(stderr, FORMAT, ## __VA_ARGS__)
 
@@ -416,7 +417,7 @@ int ddc_get_with_retries(struct display_info *display,
                          uint16_t *value)
 {
     int i;
-    for (i = 0; i < MAX_RETRIES; i++) {
+    for (i = 0; i < retry_count; i++) {
         if (ddc_vcp_get(display, option, value))
             return 1;
     }
@@ -429,7 +430,7 @@ int ddc_vcp_set_and_check(struct display_info *display,
 {
     uint16_t check;
     int i;
-    for (i = 0; i < MAX_RETRIES; i++) {
+    for (i = 0; i < retry_count; i++) {
         if (ddc_vcp_set(display, option, value) &&
             ddc_vcp_get(display, option, &check) &&
             value == check)
@@ -516,6 +517,7 @@ void usage(const char *argv0)
     fprintf(stderr, "  -g get the current settings\n");
     fprintf(stderr, "  -o <path> set path to i2c device (e.g., /dev/i2c-0)\n");
     fprintf(stderr, "  -p <phase> backlight strobe phase (0-47)\n");
+    fprintf(stderr, "  -r <retry count> increase if you're getting flakey results (default %d)\n", MAX_RETRIES);
     fprintf(stderr, "  -t <duration in us> backlight strobe time in microseconds (167-5000)\n");
     fprintf(stderr, "  -v verbose\n");
 }
@@ -532,7 +534,7 @@ int main(int argc, char *argv[])
     bool force = false;
 
     int opt;
-    while ((opt = getopt(argc, argv, "defgo:p:t:v")) != -1) {
+    while ((opt = getopt(argc, argv, "defgo:p:r:t:v")) != -1) {
         switch (opt) {
         case 'd':
             disable_strobe_override = true;
@@ -552,7 +554,7 @@ int main(int argc, char *argv[])
 
         case 'o':
             if (!detect_display(optarg, &displays[0]))
-                errx(EXIT_FAILURE, "Display not found at %s. Run \"modprobe i2c-dev\" or check permissions.", optarg);
+                errx(EXIT_FAILURE, "Display not found at %s. Make sure that you have run \"sudo modprobe i2c-dev\" and are calling this as root.", optarg);
             num_displays = 1;
             break;
 
@@ -561,6 +563,12 @@ int main(int argc, char *argv[])
             strobe_phase = strtol(optarg, NULL, 0);
             if (strobe_phase < 0 || strobe_phase > 47)
                 errx(EXIT_FAILURE, "Strobe phase must be between 0 and 47.");
+            break;
+
+        case 'r':
+            retry_count = strtol(optarg, NULL, 0);
+            if (retry_count < 1)
+                errx(EXIT_FAILURE, "Please enter a positive retry count.");
             break;
 
         case 't':
@@ -602,7 +610,7 @@ int main(int argc, char *argv[])
     if (num_displays == 0)
         num_displays = find_all_displays(displays, MAX_DISPLAYS);
     if (num_displays == 0)
-        errx(EXIT_FAILURE, "No displays detected. Run \"modprobe i2c-dev\" or check permissions.");
+        errx(EXIT_FAILURE, "No displays detected. Make sure that you have run \"sudo modprobe i2c-dev\" and are calling this as root.");
 
     printf("%d display(s) detected.\n", num_displays);
     int i;

@@ -1,4 +1,4 @@
-AC_INIT([blstrobe], [0.1.0], [fhunleth@lkc.com])
+AC_INIT([blstrobe], [0.1.1], [fhunleth@troodon-software.com])
 AC_CONFIG_SRCDIR([blstrobe.c])
 AC_CONFIG_HEADERS([config.h])
 
