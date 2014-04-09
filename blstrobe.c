@@ -76,7 +76,8 @@ struct display_id
 };
 
 struct display_id supported_displays[] = {
-    {0xd109, 0x7f2d}, // Benq XL2420Z
+    {0xd109, 0x7f2d}, // Benq XL2420Z (DVI)
+    {0xd109, 0x7f2e}, // Benq XL2420Z (HDMI)
     {0, 0}
 };
 
