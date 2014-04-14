@@ -13,7 +13,7 @@ the -f flag for now and let me know your monitor's manufacture/product ID. If
 you are having trouble with inconsistent results, try the `-r` option and let me
 know your setup and what value works for you.
 
-# Building from source
+# Building
 
 Download, compile and install the source code by running the following:
 
@@ -35,7 +35,12 @@ monitor. To load,
 
     sudo modprobe i2c-dev
 
-To turn backlight strobing on with a flash duration of 2 ms on all connected monitors,
+If you have an AMD graphics card, you may also need to load the radeonfb module.
+
+    sudo modprobe radeonfb
+
+Now that the kernel modules have been loaded, you can use the blstrobe utility. To turn
+backlight strobing on with a flash duration of 2 ms on all connected monitors,
 run the following (the time is specified in microseconds):
 
     sudo blstrobe -e -t 2000
