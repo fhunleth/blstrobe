@@ -61,6 +61,12 @@ The following is the list of options:
     -t <duration in us> backlight strobe time in microseconds (167-5000)
     -v verbose
 
+# Raspberry Pi
+
+By default, the Raspberry Pi doesn't expose the HDMI port's DDC lines via the
+Linux I2C drivers. The kernel can be patched to fix this. Instructions are at
+[koalo's blog](http://blog.koalo.de/2013/11/i2c-over-hdmi.html).
+
 # Contributing
 
 Please feel free to fork the project and send me a pull request with any
