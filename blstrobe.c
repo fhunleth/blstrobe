@@ -278,6 +278,9 @@ int receive_ddc(struct display_info *display, struct ddc_msg *msg)
 {
     int i;
     uint8_t buffer[37];
+
+    memset(buffer, 0, sizeof(buffer));
+
     if (!i2c_rdwr(display->fd, DDC_I2C_ADDR, I2C_M_RD, buffer, sizeof(buffer))) {
         DEBUG_PRINTF("%s: receive_ddc write: errno=%s\n", display->i2c_path, strerror(errno));
         return 0;
@@ -290,21 +293,27 @@ int receive_ddc(struct display_info *display, struct ddc_msg *msg)
         fprintf(stderr, "\n");
     }
 
-    int len = buffer[2] - 0x80 + 2;
-    if (len > (int) sizeof(buffer) || len < 3) {
+    // Check source field
+    uint8_t *pkt = &buffer[1];
+    if (buffer[1] != 0x6e) {
+        if (buffer[0] == 0x6e && buffer[1] >= 0x80) {
+            // Sometimes the first byte is dropped. This is easy to recover from.
+            pkt = &buffer[0];
+        } else {
+            DEBUG_PRINTF("%s: unexpected ddc source 0x%02x 0x%02x 0x%02x\n",
+                         display->i2c_path, buffer[0], buffer[1], buffer[2]);
+            return 0;
+        }
+    }
+
+    int len = pkt[1] - 0x80 + 2;
+    if (len > (int) sizeof(buffer) - 2 || len < 2) {
         DEBUG_PRINTF("%s: receive_ddc message invalid length: %d\n", display->i2c_path, len);
         return 0;
     }
 
-    // Check source field
-    if (buffer[1] != 0x6e) {
-        DEBUG_PRINTF("%s: unexpected ddc source %d\n",
-                     display->i2c_path, buffer[0]);
-        return 0;
-    }
-
     // Check for null response. Let caller decide what to do.
-    if (buffer[2] == 0x80) {
+    if (pkt[1] == 0x80) {
         DEBUG_PRINTF("%s: received null response\n", display->i2c_path);
         msg->opcode = -1;
         msg->data_len = 0;
@@ -316,15 +325,15 @@ int receive_ddc(struct display_info *display, struct ddc_msg *msg)
 
     // Check checksum
     uint8_t csum = 0x50; // Implied source
-    for (i = 1; i < len + 2; i++)
-        csum ^= buffer[i];
+    for (i = 0; i <= len; i++)
+        csum ^= pkt[i];
     if (csum != 0) {
         DEBUG_PRINTF("%s: receive_ddc bad csum: %02x\n", display->i2c_path, csum);
         return 0;
     }
 
-    msg->opcode = buffer[3];
-    memcpy(msg->data, &buffer[4], msg->data_len);
+    msg->opcode = pkt[2];
+    memcpy(msg->data, &pkt[3], msg->data_len);
     return 1;
 }
 
