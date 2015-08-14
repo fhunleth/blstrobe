@@ -72,6 +72,9 @@ struct display_id
 struct display_id supported_displays[] = {
     {0xd109, 0x7f2d}, // Benq XL2420Z (DVI)
     {0xd109, 0x7f2e}, // Benq XL2420Z (HDMI)
+    {0xd109, 0x7f30}, // Benq XL2411 (VGA D-SUB)
+    {0xd109, 0x7f31}, // Benq XL2411 (DVI)
+    {0xd109, 0x7f32}, // Benq XL2411 (HDMI)
     {0, 0}
 };
 
